@@ -1,0 +1,11 @@
+# Proteger archivos PHP
+<Files *.php>
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+# Permitir acceso a imágenes y documentos
+<FilesMatch "\.(jpg|jpeg|png|gif|pdf|doc|docx|txt)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
