@@ -1,6 +1,6 @@
 <?php
 /**
- * Controlador de tickets
+ * Controlador de tickets - ACTUALIZADO CON CAPTURA DE IP
  * Archivo: controllers/TicketController.php
  */
 
@@ -39,6 +39,9 @@ class TicketController {
                     $archivoAdjunto = $this->subirArchivo($_FILES['archivo']);
                 }
                 
+                // Capturar IP del usuario
+                $ipOrigen = $this->obtenerIPUsuario();
+                
                 // Preparar datos del ticket
                 $datos = [
                     'titulo' => trim($_POST['titulo'] ?? ''),
@@ -46,7 +49,8 @@ class TicketController {
                     'tipo_ticket_id' => intval($_POST['tipo_ticket_id'] ?? 0),
                     'prioridad' => $_POST['prioridad'] ?? 'media',
                     'usuario_id' => $usuario['id'],
-                    'archivo_adjunto' => $archivoAdjunto
+                    'archivo_adjunto' => $archivoAdjunto,
+                    'ip_origen' => $ipOrigen
                 ];
                 
                 // Crear ticket
@@ -66,6 +70,44 @@ class TicketController {
                 exit();
             }
         }
+    }
+    
+    /**
+     * Obtener IP del usuario de forma segura
+     * Considera proxies, load balancers y CDNs
+     */
+    private function obtenerIPUsuario() {
+        // Lista de headers que pueden contener la IP real
+        $ipHeaders = [
+            'HTTP_X_FORWARDED_FOR',
+            'HTTP_X_REAL_IP',
+            'HTTP_CF_CONNECTING_IP', // Cloudflare
+            'HTTP_CLIENT_IP',
+            'HTTP_X_FORWARDED',
+            'HTTP_FORWARDED_FOR',
+            'HTTP_FORWARDED',
+            'REMOTE_ADDR'
+        ];
+        
+        foreach ($ipHeaders as $header) {
+            if (!empty($_SERVER[$header])) {
+                $ips = explode(',', $_SERVER[$header]);
+                $ip = trim($ips[0]);
+                
+                // Validar que sea una IP válida
+                if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                    return $ip;
+                }
+                
+                // Si no es pública, usar la IP privada (para desarrollo local)
+                if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                    return $ip;
+                }
+            }
+        }
+        
+        // Fallback a REMOTE_ADDR
+        return $_SERVER['REMOTE_ADDR'] ?? 'unknown';
     }
     
     /**

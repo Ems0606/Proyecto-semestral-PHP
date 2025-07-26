@@ -1,6 +1,6 @@
 <?php
 /**
- * Modelo para manejo de tickets
+ * Modelo para manejo de tickets - ACTUALIZADO CON SOPORTE PARA IP
  * Archivo: models/Ticket.php
  */
 
@@ -32,8 +32,8 @@ class Ticket {
         $datos = $this->db->sanitize($datos);
         
         // Insertar ticket
-        $query = "INSERT INTO tickets (titulo, descripcion, tipo_ticket_id, usuario_id, estado, prioridad, archivo_adjunto) 
-                  VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $query = "INSERT INTO tickets (titulo, descripcion, tipo_ticket_id, usuario_id, estado, prioridad, archivo_adjunto, ip_origen) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         
         $params = [
             $datos['titulo'],
@@ -42,7 +42,8 @@ class Ticket {
             $datos['usuario_id'],
             $datos['estado'] ?? 'abierto',
             $datos['prioridad'] ?? 'media',
-            $datos['archivo_adjunto'] ?? null
+            $datos['archivo_adjunto'] ?? null,
+            $datos['ip_origen'] ?? 'unknown'
         ];
         
         $ticketId = $this->db->insert($query, $params);
@@ -110,7 +111,7 @@ class Ticket {
             $params[] = $busqueda;
         }
         
-        // Query principal
+        // Query principal - INCLUYE IP_ORIGEN
         $query = "SELECT t.*, 
                   tt.nombre as tipo_nombre,
                   u.primer_nombre as usuario_nombre, u.primer_apellido as usuario_apellido,
@@ -276,6 +277,15 @@ class Ticket {
         $resultado = $this->db->selectOne($query);
         $stats['tiempo_promedio_resolucion'] = round($resultado['promedio'] ?? 0, 2);
         
+        // Estadísticas por IP (TOP 10 IPs que más tickets crean)
+        $query = "SELECT ip_origen, COUNT(*) as total_tickets 
+                  FROM tickets 
+                  WHERE ip_origen IS NOT NULL AND ip_origen != 'unknown'
+                  GROUP BY ip_origen 
+                  ORDER BY total_tickets DESC 
+                  LIMIT 10";
+        $stats['por_ip'] = $this->db->select($query);
+        
         return $stats;
     }
     
@@ -283,7 +293,7 @@ class Ticket {
      * Buscar tickets
      */
     public function buscar($termino, $limite = 10) {
-        $query = "SELECT t.id, t.titulo, t.estado, t.prioridad, t.fecha_creacion,
+        $query = "SELECT t.id, t.titulo, t.estado, t.prioridad, t.fecha_creacion, t.ip_origen,
                   u.primer_nombre as usuario_nombre, u.primer_apellido as usuario_apellido
                   FROM tickets t 
                   LEFT JOIN usuarios u ON t.usuario_id = u.id

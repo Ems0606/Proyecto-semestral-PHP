@@ -1,6 +1,6 @@
 <?php
 /**
- * Página para ver un ticket individual
+ * Página para ver un ticket individual - ACTUALIZADA CON INFORMACIÓN DE IP
  * Archivo: views/tickets/view.php
  */
 
@@ -203,6 +203,19 @@ include __DIR__ . '/../layouts/header.php';
                     
                     <?php if (!empty($ticket['fecha_cierre'])): ?>
                     <p><strong>Cerrado:</strong> <?= date('d/m/Y H:i', strtotime($ticket['fecha_cierre'])) ?></p>
+                    <?php endif; ?>
+                    
+                    <!-- Información de IP (solo para agentes/admin) -->
+                    <?php if (esAgente() && !empty($ticket['ip_origen'])): ?>
+                    <hr>
+                    <div class="ip-info">
+                        <p><strong>🌐 IP de Origen:</strong> 
+                            <code><?= htmlspecialchars($ticket['ip_origen']) ?></code>
+                        </p>
+                        <small class="text-muted">
+                            IP desde donde se creó el ticket
+                        </small>
+                    </div>
                     <?php endif; ?>
                 </div>
             </div>
@@ -522,6 +535,21 @@ include __DIR__ . '/../layouts/header.php';
     padding: 15px;
     border-radius: 8px;
     border: 1px solid #ffeaa7;
+}
+
+.ip-info {
+    background: #e3f2fd;
+    padding: 10px;
+    border-radius: 6px;
+    border-left: 3px solid #2196f3;
+}
+
+.ip-info code {
+    background: #fff;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    color: #d63384;
 }
 
 .prioridad-baja { color: var(--success-color); font-weight: 600; }

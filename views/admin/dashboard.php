@@ -1,6 +1,6 @@
 <?php
 /**
- * Dashboard de administración
+ * Dashboard de administración - ACTUALIZADO CON ESTADÍSTICAS DE IP
  * Archivo: views/admin/dashboard.php
  */
 
@@ -101,7 +101,7 @@ include __DIR__ . '/../layouts/header.php';
     <!-- Gráficos y estadísticas detalladas -->
     <div class="row mb-4">
         <!-- Tickets por estado -->
-        <div class="col-6">
+        <div class="col-4">
             <div class="card">
                 <div class="card-header">
                     <h4>📈 Tickets por Estado</h4>
@@ -128,7 +128,7 @@ include __DIR__ . '/../layouts/header.php';
         </div>
         
         <!-- Usuarios por rol -->
-        <div class="col-6">
+        <div class="col-4">
             <div class="card">
                 <div class="card-header">
                     <h4>👥 Usuarios por Rol</h4>
@@ -147,6 +147,36 @@ include __DIR__ . '/../layouts/header.php';
                             </div>
                         </div>
                     <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TOP IPs que más tickets crean -->
+        <div class="col-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>🌐 TOP IPs Creadoras</h4>
+                </div>
+                <div class="card-body">
+                    <?php if (!empty($estadisticasTickets['por_ip'])): ?>
+                        <?php foreach ($estadisticasTickets['por_ip'] as $ipStat): ?>
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <code class="ip-address"><?= htmlspecialchars($ipStat['ip_origen']) ?></code>
+                                    </div>
+                                    <span class="badge badge-info"><?= $ipStat['total_tickets'] ?></span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-info" 
+                                         style="width: <?= count($estadisticasTickets['por_ip']) > 0 ? ($ipStat['total_tickets'] / $estadisticasTickets['por_ip'][0]['total_tickets']) * 100 : 0 ?>%">
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p class="text-muted">No hay datos de IP disponibles</p>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -251,6 +281,7 @@ include __DIR__ . '/../layouts/header.php';
                                         <th>Usuario</th>
                                         <th>Estado</th>
                                         <th>Prioridad</th>
+                                        <th>IP Origen</th>
                                         <th>Fecha</th>
                                         <th>Acciones</th>
                                     </tr>
@@ -261,8 +292,8 @@ include __DIR__ . '/../layouts/header.php';
                                         <td><strong>#<?= $ticket['id'] ?></strong></td>
                                         <td>
                                             <a href="<?= getBaseUrl() ?>/views/tickets/view.php?id=<?= $ticket['id'] ?>">
-                                                <?= htmlspecialchars(substr($ticket['titulo'], 0, 50)) ?>
-                                                <?= strlen($ticket['titulo']) > 50 ? '...' : '' ?>
+                                                <?= htmlspecialchars(substr($ticket['titulo'], 0, 40)) ?>
+                                                <?= strlen($ticket['titulo']) > 40 ? '...' : '' ?>
                                             </a>
                                         </td>
                                         <td>
@@ -284,6 +315,13 @@ include __DIR__ . '/../layouts/header.php';
                                                 echo $icons[$ticket['prioridad']];
                                                 ?>
                                             </span>
+                                        </td>
+                                        <td>
+                                            <?php if (!empty($ticket['ip_origen'])): ?>
+                                                <code class="ip-small"><?= htmlspecialchars($ticket['ip_origen']) ?></code>
+                                            <?php else: ?>
+                                                <span class="text-muted">N/A</span>
+                                            <?php endif; ?>
                                         </td>
                                         <td>
                                             <small>
@@ -366,8 +404,32 @@ include __DIR__ . '/../layouts/header.php';
     font-size: 14px;
 }
 
+.ip-address {
+    background: #e3f2fd;
+    color: #1976d2;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+}
+
+.ip-small {
+    background: #f8f9fa;
+    color: #495057;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+}
+
+.prioridad-baja { color: var(--success-color); font-weight: 600; }
+.prioridad-media { color: var(--warning-color); font-weight: 600; }
+.prioridad-alta { color: #fd7e14; font-weight: 600; }
+.prioridad-urgente { color: var(--danger-color); font-weight: 600; }
+
 @media (max-width: 768px) {
     .col-3,
+    .col-4,
     .col-6 {
         flex: 0 0 100%;
         max-width: 100%;
@@ -408,6 +470,16 @@ function updateDateTime() {
 // Actualizar cada segundo
 setInterval(updateDateTime, 1000);
 updateDateTime();
+
+// Tooltip para IPs
+document.addEventListener('DOMContentLoaded', function() {
+    const ipElements = document.querySelectorAll('.ip-address, .ip-small');
+    ipElements.forEach(element => {
+        element.addEventListener('mouseenter', function() {
+            this.title = 'IP desde donde se creó el ticket';
+        });
+    });
+});
 </script>
 
 <?php include __DIR__ . '/../layouts/footer.php'; ?>
