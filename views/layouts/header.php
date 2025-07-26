@@ -1,6 +1,6 @@
 <?php
 /**
- * Header común para todas las páginas
+ * Header común para todas las páginas - COMPLETO CON NOTICIAS
  * Archivo: views/layouts/header.php
  */
 
@@ -156,6 +156,56 @@ $paginaActual = basename($_SERVER['PHP_SELF']);
                         <a href="<?= getBaseUrl() ?>/views/public/help.php" 
                            class="<?= $paginaActual === 'help.php' ? 'active' : '' ?>">
                             ❓ Ayuda
+                        </a>
+                    </li>
+                    
+                    <!-- Noticias - NUEVO ENLACE -->
+                    <li class="nav-item">
+                        <a href="<?= getBaseUrl() ?>/views/public/news.php" 
+                           class="<?= $paginaActual === 'news.php' ? 'active' : '' ?>">
+                            📰 Noticias
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <?php else: ?>
+        <!-- Navegación para usuarios no autenticados -->
+        <nav class="navbar">
+            <div class="nav-content">
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="<?= getBaseUrl() ?>/views/public/home.php" 
+                           class="<?= $paginaActual === 'home.php' ? 'active' : '' ?>">
+                            🏠 Inicio
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="<?= getBaseUrl() ?>/views/public/help.php" 
+                           class="<?= $paginaActual === 'help.php' ? 'active' : '' ?>">
+                            ❓ Mesa de Ayuda
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="<?= getBaseUrl() ?>/views/public/news.php" 
+                           class="<?= $paginaActual === 'news.php' ? 'active' : '' ?>">
+                            📰 Noticias
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="<?= getBaseUrl() ?>/views/auth/login.php" 
+                           class="<?= $paginaActual === 'login.php' ? 'active' : '' ?>">
+                            🔐 Iniciar Sesión
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="<?= getBaseUrl() ?>/views/auth/register.php" 
+                           class="<?= $paginaActual === 'register.php' ? 'active' : '' ?>">
+                            ✅ Registrarse
                         </a>
                     </li>
                 </ul>

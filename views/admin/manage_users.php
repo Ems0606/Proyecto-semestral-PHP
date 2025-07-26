@@ -1,6 +1,6 @@
 <?php
 /**
- * Gestión de usuarios para administradores
+ * Gestión de usuarios para administradores - COMPLETO CON EXCEL
  * Archivo: views/admin/manage_users.php
  */
 
@@ -45,7 +45,10 @@ include __DIR__ . '/../layouts/header.php';
                             ➕ Crear Usuario
                         </a>
                         <a href="<?= getBaseUrl() ?>/controllers/UserController.php?action=exportar_csv" class="btn btn-secondary">
-                            📥 Exportar CSV
+                            📄 Exportar CSV
+                        </a>
+                        <a href="<?= getBaseUrl() ?>/controllers/UserController.php?action=exportar_excel" class="btn btn-primary">
+                            📊 Exportar Excel
                         </a>
                     </div>
                 </div>
@@ -405,6 +408,22 @@ include __DIR__ . '/../layouts/header.php';
         margin-bottom: 5px;
         margin-right: 0;
     }
+    
+    .card-header div {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .card-header div:last-child {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    
+    .card-header .btn {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
 }
 </style>
 
@@ -449,6 +468,28 @@ document.getElementById('nombre').addEventListener('input', function() {
     if (query.length >= 2) {
         // Implementar búsqueda AJAX si se desea
         console.log('Buscando:', query);
+    }
+});
+
+// Confirmación para exportar Excel
+document.addEventListener('DOMContentLoaded', function() {
+    const excelBtn = document.querySelector('a[href*="exportar_excel"]');
+    if (excelBtn) {
+        excelBtn.addEventListener('click', function(e) {
+            if (!confirm('¿Desea exportar todos los usuarios a formato Excel?\n\nEsto puede tomar unos momentos...')) {
+                e.preventDefault();
+            } else {
+                // Mostrar mensaje de espera
+                this.innerHTML = '⏳ Generando Excel...';
+                this.style.pointerEvents = 'none';
+                
+                // Restaurar después de 3 segundos
+                setTimeout(() => {
+                    this.innerHTML = '📊 Exportar Excel';
+                    this.style.pointerEvents = 'auto';
+                }, 3000);
+            }
+        });
     }
 });
 </script>

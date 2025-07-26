@@ -1,6 +1,6 @@
 <?php
 /**
- * Controlador de usuarios
+ * Controlador de usuarios - COMPLETO CON EXPORT EXCEL
  * Archivo: controllers/UserController.php
  */
 
@@ -334,113 +334,6 @@ class UserController {
     }
     
     /**
-     * Subir foto de perfil
-     */
-    private function subirFotoPerfil($archivo) {
-        // Verificar errores de subida
-        if ($archivo['error'] !== UPLOAD_ERR_OK) {
-            throw new Exception("Error al subir la foto de perfil");
-        }
-        
-        // Verificar tamaño (máximo 2MB para fotos)
-        $maxSize = 2 * 1024 * 1024; // 2MB
-        if ($archivo['size'] > $maxSize) {
-            throw new Exception("La foto es demasiado grande (máximo 2MB)");
-        }
-        
-        // Verificar que sea una imagen
-        $tiposPermitidos = ['image/jpeg', 'image/png', 'image/gif'];
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $tipoArchivo = finfo_file($finfo, $archivo['tmp_name']);
-        finfo_close($finfo);
-        
-        if (!in_array($tipoArchivo, $tiposPermitidos)) {
-            throw new Exception("Solo se permiten imágenes JPG, PNG o GIF");
-        }
-        
-        // Verificar extensión
-        $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
-        if (!in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
-            throw new Exception("Extensión de archivo no permitida");
-        }
-        
-        // Generar nombre único
-        $nombreArchivo = 'perfil_' . uniqid() . '_' . time() . '.' . $extension;
-        $rutaCompleta = __DIR__ . '/../' . UPLOAD_PATH . 'perfiles/' . $nombreArchivo;
-        
-        // Crear directorio si no existe
-        $directorio = dirname($rutaCompleta);
-        if (!is_dir($directorio)) {
-            mkdir($directorio, 0755, true);
-        }
-        
-        // Mover archivo
-        if (move_uploaded_file($archivo['tmp_name'], $rutaCompleta)) {
-            return 'perfiles/' . $nombreArchivo;
-        } else {
-            throw new Exception("Error al guardar la foto de perfil");
-        }
-    }
-    
-    /**
-     * Validar datos de usuario
-     */
-    private function validarDatos($datos, $esActualizacion = false) {
-        $errores = [];
-        
-        // Validar campos requeridos
-        if (!$esActualizacion) {
-            $camposRequeridos = ['primer_nombre', 'primer_apellido', 'email', 'password', 'sexo', 'identificacion', 'fecha_nacimiento'];
-            foreach ($camposRequeridos as $campo) {
-                if (empty($datos[$campo])) {
-                    $errores[] = "El campo {$campo} es requerido";
-                }
-            }
-        }
-        
-        // Validar email
-        if (!empty($datos['email']) && !filter_var($datos['email'], FILTER_VALIDATE_EMAIL)) {
-            $errores[] = "El email no es válido";
-        }
-        
-        // Validar password
-        if (!empty($datos['password']) && strlen($datos['password']) < 6) {
-            $errores[] = "La contraseña debe tener al menos 6 caracteres";
-        }
-        
-        // Validar sexo
-        if (!empty($datos['sexo']) && !in_array($datos['sexo'], ['M', 'F'])) {
-            $errores[] = "El sexo debe ser M o F";
-        }
-        
-        // Validar fecha de nacimiento
-        if (!empty($datos['fecha_nacimiento'])) {
-            $fecha = DateTime::createFromFormat('Y-m-d', $datos['fecha_nacimiento']);
-            if (!$fecha || $fecha->format('Y-m-d') !== $datos['fecha_nacimiento']) {
-                $errores[] = "La fecha de nacimiento no es válida";
-            } else {
-                // Verificar que sea mayor de edad (18 años)
-                $hoy = new DateTime();
-                $edad = $hoy->diff($fecha)->y;
-                if ($edad < 18) {
-                    $errores[] = "Debe ser mayor de 18 años";
-                }
-            }
-        }
-        
-        // Validar identificación (solo números y letras)
-        if (!empty($datos['identificacion']) && !preg_match('/^[a-zA-Z0-9-]+$/', $datos['identificacion'])) {
-            $errores[] = "La identificación solo puede contener números, letras y guiones";
-        }
-        
-        if (!empty($errores)) {
-            throw new Exception(implode(', ', $errores));
-        }
-        
-        return true;
-    }
-    
-    /**
      * Exportar usuarios a CSV
      */
     public function exportarCSV() {
@@ -494,6 +387,150 @@ class UserController {
         
         fclose($output);
         exit();
+    }
+    
+    /**
+     * Exportar usuarios a Excel - NUEVA FUNCIÓN
+     */
+    public function exportarExcel() {
+        requerirPermiso('usuarios', 'read');
+        
+        $usuarios = $this->userModel->obtenerTodos(1, [])['data'];
+        
+        // Configurar headers para descarga de Excel
+        header('Content-Type: application/vnd.ms-excel; charset=utf-8');
+        header('Content-Disposition: attachment; filename="usuarios_' . date('Y-m-d') . '.xls"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+        
+        // Crear contenido HTML que Excel interpretará
+        echo '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
+        echo '<head>';
+        echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">';
+        echo '<meta name="ProgId" content="Excel.Sheet">';
+        echo '<style>';
+        echo 'table { border-collapse: collapse; width: 100%; }';
+        echo 'th, td { border: 1px solid #000; padding: 8px; text-align: left; }';
+        echo 'th { background-color: #4CAF50; color: white; font-weight: bold; }';
+        echo 'tr:nth-child(even) { background-color: #f2f2f2; }';
+        echo '</style>';
+        echo '</head>';
+        echo '<body>';
+        
+        echo '<h1>Reporte de Usuarios - Sistema de Tickets</h1>';
+        echo '<p>Generado el: ' . date('d/m/Y H:i:s') . '</p>';
+        echo '<p>Total de usuarios: ' . count($usuarios) . '</p>';
+        echo '<br>';
+        
+        echo '<table>';
+        echo '<tr>';
+        echo '<th>ID</th>';
+        echo '<th>Primer Nombre</th>';
+        echo '<th>Segundo Nombre</th>';
+        echo '<th>Primer Apellido</th>';
+        echo '<th>Segundo Apellido</th>';
+        echo '<th>Email</th>';
+        echo '<th>Identificación</th>';
+        echo '<th>Sexo</th>';
+        echo '<th>Fecha Nacimiento</th>';
+        echo '<th>Edad</th>';
+        echo '<th>Rol</th>';
+        echo '<th>Estado</th>';
+        echo '<th>Fecha Registro</th>';
+        echo '</tr>';
+        
+        foreach ($usuarios as $usuario) {
+            // Calcular edad
+            $fechaNac = new DateTime($usuario['fecha_nacimiento']);
+            $hoy = new DateTime();
+            $edad = $hoy->diff($fechaNac)->y;
+            
+            echo '<tr>';
+            echo '<td>' . $usuario['id'] . '</td>';
+            echo '<td>' . htmlspecialchars($usuario['primer_nombre']) . '</td>';
+            echo '<td>' . htmlspecialchars($usuario['segundo_nombre']) . '</td>';
+            echo '<td>' . htmlspecialchars($usuario['primer_apellido']) . '</td>';
+            echo '<td>' . htmlspecialchars($usuario['segundo_apellido']) . '</td>';
+            echo '<td>' . htmlspecialchars($usuario['email']) . '</td>';
+            echo '<td>' . htmlspecialchars($usuario['identificacion']) . '</td>';
+            echo '<td>' . ($usuario['sexo'] === 'M' ? 'Masculino' : 'Femenino') . '</td>';
+            echo '<td>' . date('d/m/Y', strtotime($usuario['fecha_nacimiento'])) . '</td>';
+            echo '<td>' . $edad . ' años</td>';
+            echo '<td>' . htmlspecialchars($usuario['rol_nombre']) . '</td>';
+            echo '<td style="' . ($usuario['activo'] ? 'color: green; font-weight: bold;' : 'color: red; font-weight: bold;') . '">' . 
+                 ($usuario['activo'] ? 'Activo' : 'Inactivo') . '</td>';
+            echo '<td>' . date('d/m/Y H:i:s', strtotime($usuario['created_at'])) . '</td>';
+            echo '</tr>';
+        }
+        
+        echo '</table>';
+        
+        // Estadísticas adicionales
+        $activos = array_filter($usuarios, function($u) { return $u['activo']; });
+        $inactivos = array_filter($usuarios, function($u) { return !$u['activo']; });
+        
+        echo '<br><br>';
+        echo '<h2>Estadísticas Resumen</h2>';
+        echo '<table>';
+        echo '<tr><th>Estadística</th><th>Valor</th></tr>';
+        echo '<tr><td>Total de Usuarios</td><td>' . count($usuarios) . '</td></tr>';
+        echo '<tr><td>Usuarios Activos</td><td>' . count($activos) . '</td></tr>';
+        echo '<tr><td>Usuarios Inactivos</td><td>' . count($inactivos) . '</td></tr>';
+        echo '<tr><td>Porcentaje Activos</td><td>' . (count($usuarios) > 0 ? round((count($activos) / count($usuarios)) * 100, 2) : 0) . '%</td></tr>';
+        echo '</table>';
+        
+        echo '</body>';
+        echo '</html>';
+        exit();
+    }
+    
+    /**
+     * Subir foto de perfil
+     */
+    private function subirFotoPerfil($archivo) {
+        // Verificar errores de subida
+        if ($archivo['error'] !== UPLOAD_ERR_OK) {
+            throw new Exception("Error al subir la foto de perfil");
+        }
+        
+        // Verificar tamaño (máximo 2MB para fotos)
+        $maxSize = 2 * 1024 * 1024; // 2MB
+        if ($archivo['size'] > $maxSize) {
+            throw new Exception("La foto es demasiado grande (máximo 2MB)");
+        }
+        
+        // Verificar que sea una imagen
+        $tiposPermitidos = ['image/jpeg', 'image/png', 'image/gif'];
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $tipoArchivo = finfo_file($finfo, $archivo['tmp_name']);
+        finfo_close($finfo);
+        
+        if (!in_array($tipoArchivo, $tiposPermitidos)) {
+            throw new Exception("Solo se permiten imágenes JPG, PNG o GIF");
+        }
+        
+        // Verificar extensión
+        $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
+        if (!in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
+            throw new Exception("Extensión de archivo no permitida");
+        }
+        
+        // Generar nombre único
+        $nombreArchivo = 'perfil_' . uniqid() . '_' . time() . '.' . $extension;
+        $rutaCompleta = __DIR__ . '/../' . UPLOAD_PATH . 'perfiles/' . $nombreArchivo;
+        
+        // Crear directorio si no existe
+        $directorio = dirname($rutaCompleta);
+        if (!is_dir($directorio)) {
+            mkdir($directorio, 0755, true);
+        }
+        
+        // Mover archivo
+        if (move_uploaded_file($archivo['tmp_name'], $rutaCompleta)) {
+            return 'perfiles/' . $nombreArchivo;
+        } else {
+            throw new Exception("Error al guardar la foto de perfil");
+        }
     }
     
     /**
@@ -557,6 +594,10 @@ class UserController {
                 
             case 'exportar_csv':
                 $this->exportarCSV();
+                break;
+                
+            case 'exportar_excel':
+                $this->exportarExcel();
                 break;
                 
             default:
