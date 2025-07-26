@@ -37,9 +37,9 @@ define('SMTP_PASSWORD', '');
 // Zona horaria
 date_default_timezone_set('America/Panama');
 
-// Configuración de errores (habilitar para desarrollo)
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// Configuración de errores (deshabilitado para producción)
+error_reporting(E_ERROR | E_PARSE);
+ini_set('display_errors', 0);
 
 /**
  * Función para obtener la URL base de la aplicación
