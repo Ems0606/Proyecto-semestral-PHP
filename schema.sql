@@ -10,7 +10,6 @@ CREATE TABLE roles (
     permisos JSON,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
 -- Tabla de usuarios
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
