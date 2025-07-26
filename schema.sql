@@ -115,3 +115,11 @@ INSERT INTO usuarios (primer_nombre, segundo_nombre, primer_apellido, segundo_ap
 -- Insertar datos de estadísticas iniciales
 INSERT INTO estadisticas (fecha, tickets_creados, tickets_resueltos, tickets_cerrados, tiempo_promedio_resolucion) VALUES
 (CURDATE(), 0, 0, 0, 0.00);
+
+-- Actualización de la tabla tickets para agregar columna IP
+-- Ejecutar este SQL en tu base de datos
+
+ALTER TABLE tickets ADD COLUMN ip_origen VARCHAR(45) AFTER archivo_adjunto;
+
+-- Verificar que se agregó la columna
+DESCRIBE tickets;
