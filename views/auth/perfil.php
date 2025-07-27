@@ -23,10 +23,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Obtener datos del usuario actual
 $usuarioActual = obtenerUsuarioActual();
-$usuario = $userController->perfil($usuarioActual['id']);
+$perfil = $userController->obtenerDatosPrincipales($usuarioActual['id']);
+
 
 // Verificar que el usuario existe
-if (!$usuario) {
+if (!$perfil) {
     $_SESSION['error'] = "Error al cargar el perfil del usuario";
     header('Location: ' . getBaseUrl() . '/views/public/home.php');
     exit();
@@ -81,15 +82,15 @@ include __DIR__ . '/../layouts/header.php';
                         <!-- Foto de perfil -->
                         <div class="form-group text-center mb-4">
                             <div class="profile-photo-container">
-                                <?php if (!empty($usuario['foto_perfil'])): ?>
-                                    <img src="<?= getBaseUrl() ?>/assets/uploads/<?= htmlspecialchars($usuario['foto_perfil']) ?>" 
+                                <?php if (!empty($perfil['foto_perfil'])): ?>
+                                    <img src="<?= getBaseUrl() ?>/assets/uploads/<?= htmlspecialchars($perfil['foto_perfil']) ?>" 
                                          alt="Foto de perfil" 
                                          class="profile-photo"
                                          id="current-photo">
                                 <?php else: ?>
                                     <div class="profile-photo-placeholder" id="current-photo">
                                         <span class="profile-initial">
-                                            <?= strtoupper(substr($usuario['primer_nombre'] ?? 'U', 0, 1)) ?>
+                                            <?= strtoupper(substr($perfil['primer_nombre'] ?? 'U', 0, 1)) ?>
                                         </span>
                                     </div>
                                 <?php endif; ?>
@@ -119,7 +120,7 @@ include __DIR__ . '/../layouts/header.php';
                                            id="primer_nombre" 
                                            name="primer_nombre" 
                                            class="form-control" 
-                                           value="<?= htmlspecialchars($usuario['primer_nombre'] ?? '') ?>"
+                                           value="<?= htmlspecialchars($perfil['primer_nombre'] ?? '') ?>"
                                            required>
                                 </div>
                             </div>
@@ -132,7 +133,7 @@ include __DIR__ . '/../layouts/header.php';
                                            id="segundo_nombre" 
                                            name="segundo_nombre" 
                                            class="form-control" 
-                                           value="<?= htmlspecialchars($usuario['segundo_nombre'] ?? '') ?>">
+                                           value="<?= htmlspecialchars($perfil['segundo_nombre'] ?? '') ?>">
                                 </div>
                             </div>
                         </div>
@@ -146,7 +147,7 @@ include __DIR__ . '/../layouts/header.php';
                                            id="primer_apellido" 
                                            name="primer_apellido" 
                                            class="form-control" 
-                                           value="<?= htmlspecialchars($usuario['primer_apellido'] ?? '') ?>"
+                                           value="<?= htmlspecialchars($perfil['primer_apellido'] ?? '') ?>"
                                            required>
                                 </div>
                             </div>
@@ -159,7 +160,7 @@ include __DIR__ . '/../layouts/header.php';
                                            id="segundo_apellido" 
                                            name="segundo_apellido" 
                                            class="form-control" 
-                                           value="<?= htmlspecialchars($usuario['segundo_apellido'] ?? '') ?>">
+                                           value="<?= htmlspecialchars($perfil['segundo_apellido'] ?? '') ?>">
                                 </div>
                             </div>
                         </div>
@@ -173,7 +174,7 @@ include __DIR__ . '/../layouts/header.php';
                                            id="email" 
                                            name="email" 
                                            class="form-control" 
-                                           value="<?= htmlspecialchars($usuario['email'] ?? '') ?>"
+                                           value="<?= htmlspecialchars($perfil['email'] ?? '') ?>"
                                            required>
                                 </div>
                             </div>
@@ -186,7 +187,7 @@ include __DIR__ . '/../layouts/header.php';
                                            id="identificacion" 
                                            name="identificacion" 
                                            class="form-control" 
-                                           value="<?= htmlspecialchars($usuario['identificacion'] ?? '') ?>"
+                                           value="<?= htmlspecialchars($perfil['identificacion'] ?? '') ?>"
                                            required>
                                 </div>
                             </div>
@@ -198,8 +199,8 @@ include __DIR__ . '/../layouts/header.php';
                                 <div class="form-group">
                                     <label for="sexo" class="form-label">Sexo: *</label>
                                     <select id="sexo" name="sexo" class="form-control form-select" required>
-                                        <option value="M" <?= ($usuario['sexo'] ?? '') === 'M' ? 'selected' : '' ?>>Masculino</option>
-                                        <option value="F" <?= ($usuario['sexo'] ?? '') === 'F' ? 'selected' : '' ?>>Femenino</option>
+                                        <option value="M" <?= ($perfil['sexo'] ?? '') === 'M' ? 'selected' : '' ?>>Masculino</option>
+                                        <option value="F" <?= ($perfil['sexo'] ?? '') === 'F' ? 'selected' : '' ?>>Femenino</option>
                                     </select>
                                 </div>
                             </div>
@@ -212,7 +213,7 @@ include __DIR__ . '/../layouts/header.php';
                                            id="fecha_nacimiento" 
                                            name="fecha_nacimiento" 
                                            class="form-control"
-                                           value="<?= htmlspecialchars($usuario['fecha_nacimiento'] ?? '') ?>"
+                                           value="<?= htmlspecialchars($perfil['fecha_nacimiento'] ?? '') ?>"
                                            required>
                                 </div>
                             </div>
@@ -224,7 +225,7 @@ include __DIR__ . '/../layouts/header.php';
                                     <input type="text" 
                                            id="rol" 
                                            class="form-control" 
-                                           value="<?= htmlspecialchars($usuario['rol_nombre'] ?? 'Sin rol') ?>"
+                                           value="<?= htmlspecialchars($perfil['rol_nombre'] ?? 'Sin rol') ?>"
                                            readonly>
                                     <div class="form-text">El rol solo puede ser cambiado por un administrador</div>
                                 </div>
@@ -238,7 +239,7 @@ include __DIR__ . '/../layouts/header.php';
                                     <label class="form-label">Fecha de Registro:</label>
                                     <input type="text" 
                                            class="form-control" 
-                                           value="<?= isset($usuario['created_at']) ? date('d/m/Y H:i', strtotime($usuario['created_at'])) : 'No disponible' ?>"
+                                           value="<?= isset($perfil['created_at']) ? date('d/m/Y H:i', strtotime($perfil['created_at'])) : 'No disponible' ?>"
                                            readonly>
                                 </div>
                             </div>
@@ -247,7 +248,7 @@ include __DIR__ . '/../layouts/header.php';
                                     <label class="form-label">Última Actualización:</label>
                                     <input type="text" 
                                            class="form-control" 
-                                           value="<?= isset($usuario['updated_at']) ? date('d/m/Y H:i', strtotime($usuario['updated_at'])) : 'No disponible' ?>"
+                                           value="<?= isset($perfil['updated_at']) ? date('d/m/Y H:i', strtotime($perfil['updated_at'])) : 'No disponible' ?>"
                                            readonly>
                                 </div>
                             </div>

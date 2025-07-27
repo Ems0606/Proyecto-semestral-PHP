@@ -354,25 +354,20 @@ include __DIR__ . '/../layouts/header.php';
                     <h4>🚀 Acciones Rápidas</h4>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-3">
+                    <div class="row justify-content-center">
+                        <div class="col-5">
                             <a href="<?= getBaseUrl() ?>/views/admin/manage_users.php" class="btn btn-primary btn-lg d-block">
                                 👥 Gestionar Usuarios
                             </a>
                         </div>
-                        <div class="col-3">
+                        <div class="col-5">
                             <a href="<?= getBaseUrl() ?>/views/tickets/list.php?todos=1" class="btn btn-info btn-lg d-block">
                                 📋 Ver Todos los Tickets
                             </a>
                         </div>
-                        <div class="col-3">
+                        <div class="col-5">
                             <a href="<?= getBaseUrl() ?>/views/admin/reports.php" class="btn btn-success btn-lg d-block">
                                 📊 Reportes Avanzados
-                            </a>
-                        </div>
-                        <div class="col-3">
-                            <a href="<?= getBaseUrl() ?>/views/admin/settings.php" class="btn btn-secondary btn-lg d-block">
-                                ⚙️ Configuración
                             </a>
                         </div>
                     </div>

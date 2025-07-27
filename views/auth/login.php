@@ -38,11 +38,11 @@ include __DIR__ . '/../layouts/header.php';
 ?>
 
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-6">
+    <div class="justify-content-center">
+        <div class="col-18">
             <div class="card">
-                <div class="card-header text-center">
-                    <h2>Iniciar Sesión</h2>
+                <div class="card-header text-center" style="flex-direction: column;">
+                    <h2>Iniciar Sesión</h2> 
                     <p>Acceda a su cuenta para gestionar tickets</p>
                 </div>
                 
@@ -130,7 +130,7 @@ include __DIR__ . '/../layouts/header.php';
 .main-content {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: calc(100vh - 140px);
-    display: flex;
+    justify-content: center;
     align-items: center;
 }
 

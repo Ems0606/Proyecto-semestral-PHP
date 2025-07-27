@@ -105,7 +105,7 @@ body {
 .nav-menu {
     display: flex;
     list-style: none;
-    gap: 30px;
+    gap: auto;
 }
 
 .nav-item a {

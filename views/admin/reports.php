@@ -140,7 +140,20 @@ include __DIR__ . '/../layouts/header.php';
                                 📥 Exportar Reporte
                             </button>
                         </div>
+                        <div class="col-3">
+                            <label class="form-label">&nbsp;</label>
+                        </div>
                     </form>
+                    <div class="row mt-2">
+                        <div class="col-3 offset-9">
+                            <form id="exportarExcelForm" action="../../controllers/UserController.php" method="post" style="display:inline;" target="_blank">
+                                <input type="hidden" name="action" value="exportar_excel">
+                                <button type="submit" class="btn btn-outline-success d-block w-100">
+                                    📊 Exportar Usuarios a Excel
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

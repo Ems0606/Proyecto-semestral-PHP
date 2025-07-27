@@ -606,10 +606,38 @@ class UserController {
                 break;
         }
     }
+    /**
+     * Obtener datos principales de un usuario por ID
+     * Devuelve: primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, email, identificacion, sexo, fecha_nacimiento, rol, fecha_registro, fecha_actualizacion
+     */
+    public function obtenerDatosPrincipales($id) {
+        requerirAutenticacion();
+        $usuario = $this->userModel->obtenerPorId($id);
+        if (!$usuario) {
+            return null;
+        }
+        return [
+            'primer_nombre' => $usuario['primer_nombre'] ?? '',
+            'segundo_nombre' => $usuario['segundo_nombre'] ?? '',
+            'primer_apellido' => $usuario['primer_apellido'] ?? '',
+            'segundo_apellido' => $usuario['segundo_apellido'] ?? '',
+            'foto_perfil' => $usuario['foto_perfil'] ?? '',
+            'email' => $usuario['email'] ?? '',
+            'identificacion' => $usuario['identificacion'] ?? '',
+            'sexo' => $usuario['sexo'] ?? '',
+            'fecha_nacimiento' => $usuario['fecha_nacimiento'] ?? '',
+            'rol' => $usuario['rol_nombre'] ?? '',
+            'fecha_registro' => $usuario['created_at'] ?? '',
+            'fecha_actualizacion' => $usuario['updated_at'] ?? ''
+        ];
+    }
 }
 
-// Si se accede directamente al controlador
-if ($_SERVER['SCRIPT_NAME'] === '/sistema-tickets/controllers/UserController.php') {
+// Procesar acción si se accede directamente o si se recibe un action por POST/GET
+if (
+    basename(__FILE__) === basename($_SERVER['SCRIPT_FILENAME']) ||
+    isset($_POST['action']) || isset($_GET['action'])
+) {
     $controller = new UserController();
     $controller->procesarAccion();
 }

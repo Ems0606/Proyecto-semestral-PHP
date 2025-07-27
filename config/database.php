@@ -13,7 +13,7 @@ define('DB_PASS', '');
 define('DB_CHARSET', 'utf8mb4');
 
 // CONFIGURACIÓN ESPECÍFICA PARA TU SETUP
-define('APP_URL', 'http://localhost/sistema_tickets');
+define('APP_URL', 'http://localhost/Proyecto-semestral-PHP');
 define('APP_NAME', 'Sistema de Tickets');
 define('APP_VERSION', '1.0');
 
