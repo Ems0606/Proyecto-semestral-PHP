@@ -119,7 +119,6 @@ sistema-tickets/
 - Ticket 1:N Respuestas (un ticket puede tener múltiples respuestas)
 - Rol 1:N Usuarios (un rol puede tener múltiples usuarios)
 
-## 📱 IFML - Modelado de Aplicación
 
 ### Flujo Principal del Usuario
 ```
@@ -169,59 +168,3 @@ php create_directories.php
 5. **Acceder al sistema**
 - http://localhost/sistema-tickets
 - Usuario admin: admin@sistema.com / password
-
-## 🎥 Video Demostrativo
-**URL del Video**: [Agregar URL del video explicativo]
-
-El video incluye:
-- Demostración de todas las funcionalidades
-- Explicación de la arquitectura MVC
-- Revisión del código principal
-- Casos de uso en vivo
-
-## 📈 Funcionalidades Destacadas
-
-### Para Estudiantes (Tu nivel)
-- **Interfaz intuitiva**: Fácil de usar sin experiencia previa
-- **Código comentado**: Explicaciones claras en cada función
-- **Arquitectura educativa**: Perfecta para aprender MVC
-- **Validaciones completas**: Aprende buenas prácticas de seguridad
-
-### Características Técnicas Avanzadas
-- Captura de IP para auditoría de seguridad
-- Sistema de roles con permisos JSON
-- Paginación automática en listados
-- Filtros y búsquedas en tiempo real
-- Encuestas de satisfacción
-- Dashboard con estadísticas
-
-## 📚 Documentación Adicional
-- **Manual de Usuario**: Guías paso a paso
-- **Manual Técnico**: Documentación del código
-- **Diagramas UML**: Casos de uso y clases
-- **Modelo IFML**: Flujos de aplicación
-
-## 🔗 Enlaces Importantes
-- **Repositorio GitHub**: [AGREGAR_URL_REPOSITORIO]
-- **Video Explicativo**: [AGREGAR_URL_VIDEO]
-- **Documentación UML**: Ver carpeta /docs/
-- **Backup Base de Datos**: schema.sql
-
-## 👨‍💻 Desarrollado Por
-**[Tu Nombre]** - Estudiante de [Tu Universidad]
-- **Curso**: [Nombre del Curso]
-- **Profesor**: [Nombre del Profesor]
-- **Fecha**: [Fecha de Entrega]
-
-## 📋 Checklist de Entrega
-- [x] Sistema funcional completo
-- [x] Arquitectura MVC implementada
-- [x] Base de datos con relaciones
-- [x] Documentación técnica
-- [ ] Video explicativo (pendiente)
-- [ ] Diagramas UML finalizados
-- [x] Código comentado y organizado
-- [x] README.md completo
-
----
-*Este proyecto cumple con todos los requisitos establecidos en la rúbrica de evaluación y demuestra el uso correcto de tecnologías web modernas con buenas prácticas de programación.*
